@@ -3,13 +3,9 @@ name: Detect File Changes Workflow
 on:
   push:
     branches:
-      - develop
+      - master
     paths:
       - 'apps/**'
-  pull_request:
-    paths:
-      - 'apps/**'
-      - 'gateway/**'
 
 jobs:
   build:
