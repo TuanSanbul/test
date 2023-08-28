@@ -15,25 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
       - name: Build Auth Service
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.modified, 'apps/auth-service') }}
-        run: echo build auth-service
+        run: echo "build auth-service"
 
       - name: Build Config Service
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.modified, 'apps/config-service') }}
-        run: echo build config-service
+        run: echo "build config-service"
 
       - name: Build Calculate Service
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.modified, 'apps/calculate-service') }}
-        run: echo build calculate-service
+        run: echo "build calculate-service"
 
       - name: Build Admin Gateway
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.modified, 'apps/admin-gateway') }}
-        run: echo build admin-gateway
+        run: echo "build admin-gateway"
 
     # Add more steps for other services and gateways if needed
