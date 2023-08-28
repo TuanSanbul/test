@@ -26,7 +26,6 @@ export class ProfileService extends BaseRepository {
     try {
       const member = await this.getOne(this.dataSourcePostgres, Member, {
         where: { id: memberId },
-        relations: { role: true },
       });
 
       return member;
