@@ -1,15 +1,44 @@
-name: first action
+name: Detect File Changes Workflow
 
-on: 
-  push: 
-    branches: 
-      - master
-    paths: 
-      - "apps/**"
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'apps/**'
+  pull_request:
+    paths:
+      - 'apps/**'
+      - 'gateway/**'
 
 jobs:
-  test-first-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo hello world
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Build Auth Service
+        if: ${{ github.event_name == 'push' && github.event.head_commit.modified | contains('apps/auth-service') }}
+        run: echo build Auth-service
+
+      - name: Build Auth Service
+        if: ${{ github.event_name == 'push' && github.event.head_commit.modified | contains('apps/auth-service') }}
+        run: echo build auth-service
+
+      - name: Build Calculate Service
+        if: ${{ github.event_name == 'push' && github.event.head_commit.modified | contains('apps/calculate-service') }}
+        run: echo build calculate-service
+
+      # Run build for the admin gateway if changes are detected
+      - name: Build Admin Gateway
+        if: ${{ github.event_name == 'push' && github.event.head_commit.modified | contains('apps/admin-gateway') }}
+        run: echo build admin-gateway
+
+    # Add more steps for other services and gateways if needed
