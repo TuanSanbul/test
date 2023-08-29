@@ -76,6 +76,7 @@ jobs:
         with:
           context: .
           file: ./apps/auth-service/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
 
@@ -104,6 +105,7 @@ jobs:
         with:
           context: .
           file: ./apps/member-service/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
 
@@ -133,6 +135,7 @@ jobs:
         with:
           context: .
           file: ./apps/calculate-service/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/calculate-service:latest
 
@@ -162,6 +165,7 @@ jobs:
         with:
           context: .
           file: ./apps/config-service/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/config-service:latest
 
@@ -196,5 +200,6 @@ jobs:
         with:
           context: .
           file: ./apps/admin-gateway/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/admin-gateway:latest
