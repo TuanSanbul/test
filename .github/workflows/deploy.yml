@@ -79,7 +79,7 @@ jobs:
         id: buildx
 
       - name: Build Auth service
-        if: auth == 'true'
+        if: $auth == 'true'
         uses: docker/build-push-action@v2
         id: build-auth-service
         with:
@@ -110,7 +110,7 @@ jobs:
         id: buildx
 
       - name: Build Member service
-        if: member == 'true'
+        if: $member == 'true'
         uses: docker/build-push-action@v2
         id: build-member-service
         with:
@@ -141,7 +141,7 @@ jobs:
         id: buildx
 
       - name: Build Calculate service
-        if: calculate == 'true'
+        if: $calculate == 'true'
         uses: docker/build-push-action@v2
         id: build-calculate-service
         with:
@@ -173,7 +173,7 @@ jobs:
         id: buildx
 
       - name: Build Config service
-        if: config == 'true'
+        if: $config == 'true'
         uses: docker/build-push-action@v2
         id: build-config-service
         with:
@@ -212,7 +212,7 @@ jobs:
         id: buildx
 
       - name: Build admin gateway
-        if: admin == 'true'
+        if: $admin == 'true'
         uses: docker/build-push-action@v2
         id: build-admin-gateway
         with:
