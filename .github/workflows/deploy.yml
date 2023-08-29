@@ -30,31 +30,25 @@ jobs:
         id: auth
         if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
         run: |
-          echo '::auth name=state::true'
+          echo '::auth name=auth::true'
 
       - name: Check Config Service
         id: config
         if: contains(steps.changed-files.outputs.modified_files, './apps/config-service')
         run: |
-          echo '::config name=state::true'
+          echo '::config name=config::true'
 
       - name: Check Member Service
         id: member
         if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
         run: |
-          echo '::member name=state::true'
+          echo '::member name=member::true'
 
       - name: Check Calculate Service
         id: calculate
         if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
         run: |
-          echo '::calculate name=state::true'
-
-      - name: Check Admin-gateway
-        id: admin
-        if: contains(steps.changed-files.outputs.modified_files, 'apps/admin-gateway')
-        run: |
-          echo '::admin name=state::true'
+          echo '::calculate name=calculate::true'
 
   deploy_auth:
     needs: check_change_files
