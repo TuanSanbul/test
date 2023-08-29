@@ -14,24 +14,4 @@ export class ConnectionStatusController extends BaseGatewayController {
   constructor(private readonly serviceClient: ServiceProviderBuilder) {
     super(ConnectionStatusController.name, ServiceName.COMMUNICATE_SERVICE);
   }
-
-  @Post('listing')
-  async getConnStatus(
-    @Body() payload: ConnStatusDto,
-    @Query() query: TimeFilterDto,
-  ) {
-    const functionName =
-      ConnectionStatusController.prototype.getConnStatus.name;
-    const pattern: IPatternMessage = {
-      cmd: this.prefixCmd(functionName),
-    };
-
-    const message = { payload: Object.assign(payload, query) };
-
-    return this.serviceClient.sendMessage(
-      ServiceName.COMMUNICATE_SERVICE,
-      message,
-      pattern,
-    );
-  }
 }

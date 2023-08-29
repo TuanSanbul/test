@@ -24,7 +24,6 @@ export class NotificationController {
   ];
   constructor(private readonly notificationService: NotificationService) {}
 
-
   @MessagePattern({
     cmd: getPattern(
       NotificationController.prefixCmd,
@@ -49,19 +48,6 @@ export class NotificationController {
   ): Promise<ResponseResult<IMutationResponse>> {
     const { id, payload } = message;
     return this.notificationService.updateNotification(id, payload);
-  }
-
-  @MessagePattern({
-    cmd: getPattern(
-      NotificationController.prefixCmd,
-      NotificationController.prototype.getOneById.name,
-    ),
-  })
-  getOneById(
-    message: IMessage<IGetDetailNotification>,
-  ): Promise<ResponseResult<Communicate>> {
-    const { payload } = message;
-    return this.notificationService.getOneById(payload);
   }
 
   @MessagePattern({
