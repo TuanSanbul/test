@@ -35,7 +35,6 @@ jobs:
 
       - name: Build Auth Service
         if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
-        run: echo "build auth-service"
         uses: docker/build-push-action@v2
         id: build-auth-service
         with:
