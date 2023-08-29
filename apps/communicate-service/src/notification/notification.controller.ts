@@ -24,18 +24,6 @@ export class NotificationController {
   ];
   constructor(private readonly notificationService: NotificationService) {}
 
-  @MessagePattern({
-    cmd: getPattern(
-      NotificationController.prefixCmd,
-      NotificationController.prototype.createNotification.name,
-    ),
-  })
-  createNotification(
-    message: IMessage<ICommunication>,
-  ): Promise<ResponseResult<IMutationResponse>> {
-    const { payload } = message;
-    return this.notificationService.createNotification(payload);
-  }
 
   @MessagePattern({
     cmd: getPattern(
