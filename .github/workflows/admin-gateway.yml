@@ -57,17 +57,17 @@ jobs:
       #     done
 
       - name: Build Auth Service
-        if: ${{ github.event_name == 'push' && contains(steps.changed-files.outputs.all_changed_files, 'apps/auth-service/**') }}
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
         run: echo "build auth-service"
 
       - name: Build Config Service
-        if: ${{ github.event_name == 'push' && contains(steps.changed-files.outputs.all_changed_files, 'apps/config-service/**') }}
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/config-service')
         run: echo "build config-service"
 
       - name: Build Calculate Service
-        if: ${{ github.event_name == 'push' && contains(steps.changed-files.outputs.all_changed_files, 'apps/calculate-service/**') }}
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
         run: echo "build calculate-service"
 
       - name: Build Admin Gateway
-        if: ${{ github.event_name == 'push' && contains(steps.changed-files.outputs.all_changed_files, 'apps/admin-gateway/**') }}
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/admin-gateway')
         run: echo "build admin-gateway"

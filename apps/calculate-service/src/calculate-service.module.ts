@@ -32,7 +32,5 @@ const dbConfig: Partial<Record<DbName, DbConfig>> = {
     }),
     DepositModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class CalculateServiceModule {}
