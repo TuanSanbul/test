@@ -14,7 +14,6 @@ jobs:
       calculate: ${{ steps.calculate.outputs.state }}
       member: ${{ steps.member.outputs.state }}
 
-    name: Test changed-files
     steps:
       - uses: actions/checkout@v3
         with:
@@ -44,6 +43,13 @@ jobs:
         id: calculate
         if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
         run: echo "state=true" >> $GITHUB_OUTPUT
+
+      - name: Display
+        run: |
+          echo "Is auth change: ${{ steps.auth.outputs.state }}"
+          echo "Is config change: ${{ steps.config.outputs.state }}"
+          echo "Is calculate change: ${{ steps.calculate.outputs.state }}"
+          echo "Is member change: ${{ steps.member.outputs.state }}"
 
   deploy_auth:
     needs: check_change_files
@@ -170,10 +176,6 @@ jobs:
       ]
     runs-on: ubuntu-latest
     steps:
-      - env:
-          admin: ${{needs.check_change_files.outputs.admin}}
-        run: echo "$admin"
-
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 

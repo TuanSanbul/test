@@ -26,6 +26,5 @@ async function bootstrap() {
   const c = 3;
   const e = 10;
   const f = 11;
-  const g = 10;
 }
 bootstrap();
