@@ -58,13 +58,9 @@ jobs:
 
   deploy_auth:
     needs: check_change_files
-    if: $auth == 'true'
+    if: ${{ needs.check_change_files.outputs.auth == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - env:
-          auth: ${{needs.check_change_files.outputs.auth}}
-        run: echo "$auth"
-
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 
