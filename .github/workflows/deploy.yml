@@ -30,25 +30,25 @@ jobs:
         id: auth
         if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
         run: |
-          echo '::auth name=auth::true'
+          echo '::set-output name=auth::true'
 
       - name: Check Config Service
         id: config
         if: contains(steps.changed-files.outputs.modified_files, './apps/config-service')
         run: |
-          echo '::config name=config::true'
+          echo '::set-output name=config::true'
 
       - name: Check Member Service
         id: member
         if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
         run: |
-          echo '::member name=member::true'
+          echo '::set-output name=member::true'
 
       - name: Check Calculate Service
         id: calculate
         if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
         run: |
-          echo '::calculate name=calculate::true'
+          echo '::set-output name=calculate::true'
 
   deploy_auth:
     needs: check_change_files
@@ -77,6 +77,7 @@ jobs:
           file: ./apps/auth-service/Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
+          
   deploy_member:
     needs: check_change_files
     if: ${{ needs.check_change_files.outputs.member == 'true' }}
