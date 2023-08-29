@@ -24,5 +24,6 @@ async function bootstrap() {
   const a = 1;
   const b = 2;
   const c = 3;
+  const d = 5;
 }
 bootstrap();
