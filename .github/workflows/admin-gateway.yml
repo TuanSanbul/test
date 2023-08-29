@@ -59,6 +59,10 @@ jobs:
       - name: Build Auth Service
         if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
         run: echo "build auth-service"
+        
+      - name: Build Member Service
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
+        run: echo "build member-service"
 
       - name: Build Config Service
         if: contains(steps.changed-files.outputs.modified_files, 'apps/config-service')
