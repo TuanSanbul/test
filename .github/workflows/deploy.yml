@@ -13,7 +13,6 @@ jobs:
       config: ${{ steps.config.outputs.state }}
       calculate: ${{ steps.calculate.outputs.state }}
       member: ${{ steps.member.outputs.state }}
-      gateway: ${{ steps.gateway.outputs.state }}
 
     name: Test changed-files
     steps:
@@ -48,7 +47,7 @@ jobs:
 
   deploy_auth:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.auth.state == 'true' }}
+    if: ${{ needs.check_change_files.outputs.auth.state == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker
@@ -76,7 +75,7 @@ jobs:
 
   deploy_member:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.member.state == 'true' }}
+    if: ${{ needs.check_change_files.outputs.member.state == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker
@@ -101,9 +100,10 @@ jobs:
           file: ./apps/member-service/Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
+
   deploy_calculate:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.calculate.state == 'true' }}
+    if: ${{ needs.check_change_files.outputs.calculate.state == true }}
     runs-on: ubuntu-latest
 
     steps:
@@ -132,7 +132,7 @@ jobs:
 
   deploy_config:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.config.state == 'true' }}
+    if: ${{ needs.check_change_files.outputs.config.state == true }}
     runs-on: ubuntu-latest
 
     steps:
