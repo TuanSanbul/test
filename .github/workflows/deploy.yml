@@ -53,7 +53,7 @@ jobs:
 
   deploy_auth:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.auth.state == true }}
+    if: ${{ needs.check_change_files.outputs.auth == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker
@@ -81,7 +81,7 @@ jobs:
 
   deploy_member:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.member.state == true }}
+    if: ${{ needs.check_change_files.outputs.member == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker
@@ -109,7 +109,7 @@ jobs:
 
   deploy_calculate:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.calculate.state == true }}
+    if: ${{ needs.check_change_files.outputs.calculate == true }}
     runs-on: ubuntu-latest
 
     steps:
@@ -138,7 +138,7 @@ jobs:
 
   deploy_config:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.config.state == true }}
+    if: ${{ needs.check_change_files.outputs.config == true }}
     runs-on: ubuntu-latest
 
     steps:
