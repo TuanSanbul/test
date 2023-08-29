@@ -16,5 +16,6 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>(config);
   app.startAllMicroservices();
   const a = 1;
+  const b = 2;
 }
 bootstrap();

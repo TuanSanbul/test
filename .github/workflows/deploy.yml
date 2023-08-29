@@ -61,6 +61,7 @@ jobs:
     steps:
       - env:
           auth: ${{needs.check_change_files.outputs.auth}}
+          run: echo "$auth"
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
@@ -89,6 +90,7 @@ jobs:
     steps:
       - env:
           member: ${{needs.check_change_files.outputs.member}}
+          run: echo "$member"
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
@@ -117,6 +119,7 @@ jobs:
     steps:
       - env:
           calculate: ${{needs.check_change_files.outputs.calculate}}
+          run: echo "$calculate"
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
@@ -146,6 +149,7 @@ jobs:
     steps:
       - env:
           config: ${{needs.check_change_files.outputs.config}}
+          run: echo "$config"
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
@@ -182,6 +186,7 @@ jobs:
     steps:
       - env:
           admin: ${{needs.check_change_files.outputs.admin}}
+          run: echo "$admin"
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
