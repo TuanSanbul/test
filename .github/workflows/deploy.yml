@@ -84,13 +84,10 @@ jobs:
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
   deploy_member:
-    runs-on: ubuntu-latest
     needs: check_change_files
+    if: ${{ needs.check_change_files.outputs.member == 'true' }}
+    runs-on: ubuntu-latest
     steps:
-      - env:
-          member: ${{needs.check_change_files.outputs.member}}
-        run: echo "$member"
-
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 
@@ -106,7 +103,6 @@ jobs:
         id: buildx
 
       - name: Build Member service
-        if: $member == 'true'
         uses: docker/build-push-action@v2
         id: build-member-service
         with:
@@ -115,13 +111,11 @@ jobs:
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
   deploy_calculate:
-    runs-on: ubuntu-latest
     needs: check_change_files
-    steps:
-      - env:
-          calculate: ${{needs.check_change_files.outputs.calculate}}
-        run: echo "$calculate"
+    if: ${{ needs.check_change_files.outputs.calculate == 'true' }}
+    runs-on: ubuntu-latest
 
+    steps:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 
@@ -137,7 +131,6 @@ jobs:
         id: buildx
 
       - name: Build Calculate service
-        if: $calculate == 'true'
         uses: docker/build-push-action@v2
         id: build-calculate-service
         with:
@@ -147,13 +140,11 @@ jobs:
           tags: ${{secrets.DOCKER_USERNAME}}/calculate-service:latest
 
   deploy_config:
-    runs-on: ubuntu-latest
     needs: check_change_files
-    steps:
-      - env:
-          config: ${{needs.check_change_files.outputs.config}}
-        run: echo "$config"
+    if: ${{ needs.check_change_files.outputs.config == 'true' }}
+    runs-on: ubuntu-latest
 
+    steps:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 
@@ -169,7 +160,6 @@ jobs:
         id: buildx
 
       - name: Build Config service
-        if: $config == 'true'
         uses: docker/build-push-action@v2
         id: build-config-service
         with:
@@ -179,7 +169,6 @@ jobs:
           tags: ${{secrets.DOCKER_USERNAME}}/config-service:latest
 
   deploy_admin:
-    runs-on: ubuntu-latest
     needs:
       [
         check_change_files,
@@ -188,6 +177,7 @@ jobs:
         deploy_member,
         deploy_auth,
       ]
+    runs-on: ubuntu-latest
     steps:
       - env:
           admin: ${{needs.check_change_files.outputs.admin}}
@@ -208,7 +198,6 @@ jobs:
         id: buildx
 
       - name: Build admin gateway
-        if: $admin == 'true'
         uses: docker/build-push-action@v2
         id: build-admin-gateway
         with:
