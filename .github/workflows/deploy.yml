@@ -58,7 +58,7 @@ jobs:
 
   deploy_auth:
     runs-on: ubuntu-latest
-    needs: [check_change_files]
+    needs: check_change_files
     steps:
       - env:
           auth: ${{needs.check_change_files.outputs.auth}}
@@ -79,16 +79,17 @@ jobs:
         id: buildx
 
       - name: Build Auth service
+        if: auth == 'true'
         uses: docker/build-push-action@v2
         id: build-auth-service
         with:
           context: .
-          file: apps/auth-service/Dockerfile
+          file: ./apps/auth-service/Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
   deploy_member:
     runs-on: ubuntu-latest
-    needs: [check_change_files]
+    needs: check_change_files
     steps:
       - env:
           member: ${{needs.check_change_files.outputs.member}}
@@ -109,6 +110,7 @@ jobs:
         id: buildx
 
       - name: Build Member service
+        if: member == 'true'
         uses: docker/build-push-action@v2
         id: build-member-service
         with:
@@ -118,7 +120,7 @@ jobs:
           tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
   deploy_calculate:
     runs-on: ubuntu-latest
-    needs: [check_change_files]
+    needs: check_change_files
     steps:
       - env:
           calculate: ${{needs.check_change_files.outputs.calculate}}
@@ -139,6 +141,7 @@ jobs:
         id: buildx
 
       - name: Build Calculate service
+        if: calculate == 'true'
         uses: docker/build-push-action@v2
         id: build-calculate-service
         with:
@@ -149,7 +152,7 @@ jobs:
 
   deploy_config:
     runs-on: ubuntu-latest
-    needs: [check_change_files]
+    needs: check_change_files
     steps:
       - env:
           config: ${{needs.check_change_files.outputs.config}}
@@ -170,6 +173,7 @@ jobs:
         id: buildx
 
       - name: Build Config service
+        if: config == 'true'
         uses: docker/build-push-action@v2
         id: build-config-service
         with:
@@ -208,6 +212,7 @@ jobs:
         id: buildx
 
       - name: Build admin gateway
+        if: admin == 'true'
         uses: docker/build-push-action@v2
         id: build-admin-gateway
         with:
