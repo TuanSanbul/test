@@ -29,30 +29,26 @@ jobs:
       - name: Check Auth Service
         id: auth
         if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
-        run: |
-          echo '::set-output name=auth::true'
+        run: echo "{state}={true}" >> $GITHUB_OUTPUT
 
       - name: Check Config Service
         id: config
         if: contains(steps.changed-files.outputs.modified_files, './apps/config-service')
-        run: |
-          echo '::set-output name=config::true'
+        run: echo "{state}={true}" >> $GITHUB_OUTPUT
 
       - name: Check Member Service
         id: member
         if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
-        run: |
-          echo '::set-output name=member::true'
+        run: echo "{state}={true}" >> $GITHUB_OUTPUT
 
       - name: Check Calculate Service
         id: calculate
         if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
-        run: |
-          echo '::set-output name=calculate::true'
+        run: echo "{state}={true}" >> $GITHUB_OUTPUT
 
   deploy_auth:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.auth == 'true' }}
+    if: ${{ needs.check_change_files.outputs.auth.state == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker
@@ -77,10 +73,10 @@ jobs:
           file: ./apps/auth-service/Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
-          
+
   deploy_member:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.member == 'true' }}
+    if: ${{ needs.check_change_files.outputs.member.state == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker
@@ -107,7 +103,7 @@ jobs:
           tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
   deploy_calculate:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.calculate == 'true' }}
+    if: ${{ needs.check_change_files.outputs.calculate.state == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -136,7 +132,7 @@ jobs:
 
   deploy_config:
     needs: check_change_files
-    if: ${{ needs.check_change_files.outputs.config == 'true' }}
+    if: ${{ needs.check_change_files.outputs.config.state == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
