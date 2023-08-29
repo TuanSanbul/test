@@ -26,6 +26,7 @@ export class AuthController {
     private readonly serviceClient: ServiceProviderBuilder,
     private readonly userAgentService: UserAgentService,
   ) {}
+  a = 2;
 
   @Public()
   @Get('health')

@@ -6,8 +6,15 @@ on:
       - master
 
 jobs:
-  changed_files:
+  check_change_files:
     runs-on: ubuntu-latest # windows-latest || macos-latest
+    outputs:
+      auth: ${{ steps.auth.outputs.state }}
+      config: ${{ steps.config.outputs.state }}
+      calculate: ${{ steps.calculate.outputs.state }}
+      member: ${{ steps.member.outputs.state }}
+      gateway: ${{ steps.gateway.outputs.state }}
+
     name: Test changed-files
     steps:
       - uses: actions/checkout@v3
@@ -18,6 +25,42 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v38
+
+      - name: Check Auth Service
+        id: auth
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
+        run: |
+          echo '::auth name=state::true'
+
+      - name: Check Config Service
+        id: config
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/config-service')
+        run: |
+          echo '::config name=state::true'
+
+      - name: Check Member Service
+        id: member
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
+        run: |
+          echo '::member name=state::true'
+
+      - name: Check Calculate Service
+        id: calculate
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
+        run: |
+          echo '::calculate name=state::true'
+
+      - name: Check Admin-gateway
+        id: admin
+        if: contains(steps.changed-files.outputs.modified_files, 'apps/admin-gateway')
+        run: |
+          echo '::admin name=state::true'
+
+  deploy_auth:
+    needs: [check_change_files]
+    steps:
+      - env:
+          auth: ${{needs.check_change_files.outputs.auth}}
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
@@ -32,9 +75,8 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
         id: buildx
-        
-      - name: Build Auth Service
-        if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
+
+      - name: Build Auth service
         uses: docker/build-push-action@v2
         id: build-auth-service
         with:
@@ -42,19 +84,124 @@ jobs:
           file: ./apps/auth-service/Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
+  deploy_member:
+    needs: [check_change_files]
+    steps:
+      - env:
+          member: ${{needs.check_change_files.outputs.member}}
 
-      - name: Build Member Service
-        if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
-        run: echo "build member-service"
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
 
-      - name: Build Config Service
-        if: contains(steps.changed-files.outputs.modified_files, 'apps/config-service')
-        run: echo "build config-service"
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
 
-      - name: Build Calculate Service
-        if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
-        run: echo "build calculate-service"
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
 
-      - name: Build Admin Gateway
-        if: contains(steps.changed-files.outputs.modified_files, 'apps/admin-gateway')
-        run: echo "build admin-gateway"
+      - name: Build Member service
+        uses: docker/build-push-action@v2
+        id: build-member-service
+        with:
+          context: .
+          file: ./apps/member-service/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
+  deploy_calculate:
+    needs: [check_change_files]
+    steps:
+      - env:
+          calculate: ${{needs.check_change_files.outputs.calculate}}
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+
+      - name: Build Calculate service
+        uses: docker/build-push-action@v2
+        id: build-calculate-service
+        with:
+          context: .
+          file: ./apps/calculate-service/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/calculate-service:latest
+
+  deploy_config:
+    needs: [check_change_files]
+    steps:
+      - env:
+          config: ${{needs.check_change_files.outputs.config}}
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+
+      - name: Build Config service
+        uses: docker/build-push-action@v2
+        id: build-config-service
+        with:
+          context: .
+          file: ./apps/config-service/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/config-service:latest
+
+  deploy_admin:
+    needs:
+      [
+        check_change_files,
+        deploy_config,
+        deploy_calculate,
+        deploy_member,
+        deploy_auth,
+      ]
+    steps:
+      - env:
+          admin: ${{needs.check_change_files.outputs.admin}}
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+
+      - name: Build admin gateway
+        uses: docker/build-push-action@v2
+        id: build-admin-gateway
+        with:
+          context: .
+          file: ./apps/admin-gateway/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/admin-gateway:latest
