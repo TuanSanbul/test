@@ -83,7 +83,7 @@ jobs:
         id: build-auth-service
         with:
           context: .
-          file: ./apps/auth-service/Dockerfile
+          file: apps/auth-service/Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
   deploy_member:
