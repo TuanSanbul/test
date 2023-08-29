@@ -57,8 +57,9 @@ jobs:
           echo '::admin name=state::true'
 
   deploy_auth:
-    runs-on: ubuntu-latest
     needs: check_change_files
+    if: $auth == 'true'
+    runs-on: ubuntu-latest
     steps:
       - env:
           auth: ${{needs.check_change_files.outputs.auth}}
@@ -79,7 +80,6 @@ jobs:
         id: buildx
 
       - name: Build Auth service
-        if: $auth == 'true'
         uses: docker/build-push-action@v2
         id: build-auth-service
         with:
