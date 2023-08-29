@@ -29,22 +29,22 @@ jobs:
       - name: Check Auth Service
         id: auth
         if: contains(steps.changed-files.outputs.modified_files, 'apps/auth-service')
-        run: echo "{state}={true}" >> $GITHUB_OUTPUT
+        run: echo "state=true" >> $GITHUB_OUTPUT
 
       - name: Check Config Service
         id: config
         if: contains(steps.changed-files.outputs.modified_files, './apps/config-service')
-        run: echo "{state}={true}" >> $GITHUB_OUTPUT
+        run: echo "state=true" >> $GITHUB_OUTPUT
 
       - name: Check Member Service
         id: member
         if: contains(steps.changed-files.outputs.modified_files, 'apps/member-service')
-        run: echo "{state}={true}" >> $GITHUB_OUTPUT
+        run: echo "state=true" >> $GITHUB_OUTPUT
 
       - name: Check Calculate Service
         id: calculate
         if: contains(steps.changed-files.outputs.modified_files, 'apps/calculate-service')
-        run: echo "{state}={true}" >> $GITHUB_OUTPUT
+        run: echo "state=true" >> $GITHUB_OUTPUT
 
   deploy_auth:
     needs: check_change_files
