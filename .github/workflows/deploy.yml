@@ -8,8 +8,8 @@ on:
 jobs:
   setup_docker:
     runs-on: ubuntu-latest
-      outputs:
-        buildx: ${{ steps.buildx.outputs.name }}
+    outputs:
+      buildx: ${{ steps.buildx.outputs.name }}
 
     steps:
       - name: Set up Docker
