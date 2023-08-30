@@ -6,18 +6,10 @@ on:
       - master
 
 jobs:
-  check_change_files:
-    runs-on: ubuntu-latest
-    outputs:
-      auth: ${{ steps.auth.outputs.state }}
-      config: ${{ steps.config.outputs.state }}
-      calculate: ${{ steps.calculate.outputs.state }}
-      member: ${{ steps.member.outputs.state }}
-  
   setup_docker:
     runs-on: ubuntu-latest
-    outputs:
-      buildx: ${{ steps.buildx.outputs.name }}
+      outputs:
+        buildx: ${{ steps.buildx.outputs.name }}
 
     steps:
       - name: Set up Docker
@@ -33,6 +25,14 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
         id: buildx
+
+  check_change_files:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.auth.outputs.state }}
+      config: ${{ steps.config.outputs.state }}
+      calculate: ${{ steps.calculate.outputs.state }}
+      member: ${{ steps.member.outputs.state }}
 
     steps:
       - uses: actions/checkout@v3
@@ -84,7 +84,7 @@ jobs:
         with:
           context: .
           file: ./apps/auth-service/Dockerfile
-          builder: ${{ needs.setup_docker.outputs.buildx }}
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth-service:latest
 
@@ -97,15 +97,13 @@ jobs:
         with:
           fetch-depth: 0
 
-     
-
       - name: Build Member service
         uses: docker/build-push-action@v2
         id: build-member-service
         with:
           context: .
           file: ./apps/member-service/Dockerfile
-          builder: ${{ needs.setup_docker.outputs.buildx }}
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/member-service:latest
 
@@ -118,15 +116,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-     
-
       - name: Build Calculate service
         uses: docker/build-push-action@v2
         id: build-calculate-service
         with:
           context: .
           file: ./apps/calculate-service/Dockerfile
-          builder: ${{ needs.setup_docker.outputs.buildx }}
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/calculate-service:latest
 
@@ -139,15 +135,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-     
-
       - name: Build Config service
         uses: docker/build-push-action@v2
         id: build-config-service
         with:
           context: .
           file: ./apps/config-service/Dockerfile
-          builder: ${{ needs.setup_docker.outputs.buildx }}
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/config-service:latest
 
@@ -168,14 +162,12 @@ jobs:
         with:
           fetch-depth: 0
 
-     
-
       - name: Build admin gateway
         uses: docker/build-push-action@v2
         id: build-admin-gateway
         with:
           context: .
           file: ./apps/admin-gateway/Dockerfile
-          builder: ${{ needs.setup_docker.outputs.buildx }}
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/admin-gateway:latest
