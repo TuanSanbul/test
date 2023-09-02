@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/admin-gateway/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/admin-gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/admin-gateway",
+  "projects": {
+    "admin-gateway": {
+      "type": "application",
+      "root": "apps/admin-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin-gateway/tsconfig.app.json"
+      }
+    },
+    "auth-service": {
+      "type": "application",
+      "root": "apps/auth-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth-service/tsconfig.app.json"
+      }
+    },
+    "config-service": {
+      "type": "application",
+      "root": "apps/config-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/config-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/config-service/tsconfig.app.json"
+      }
+    },
+    "member-service": {
+      "type": "application",
+      "root": "apps/member-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/member-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/member-service/tsconfig.app.json"
+      }
+    },
+    "communicate-service": {
+      "type": "application",
+      "root": "apps/communicate-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/communicate-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/communicate-service/tsconfig.app.json"
+      }
+    },
+    "calculate-service": {
+      "type": "application",
+      "root": "apps/calculate-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/calculate-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/calculate-service/tsconfig.app.json"
+      }
+    },
+    "user-gateway": {
+      "type": "application",
+      "root": "apps/user-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/user-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user-gateway/tsconfig.app.json"
+      }
+    },
+    "game-service": {
+      "type": "application",
+      "root": "apps/game-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/game-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/game-service/tsconfig.app.json"
+      }
+    },
+    "order-service": {
+      "type": "application",
+      "root": "apps/order-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/order-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/order-service/tsconfig.app.json"
+      }
+    }
+  }
+}

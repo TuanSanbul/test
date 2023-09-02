@@ -1,0 +1,412 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  commit-hash:
+    runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.commit_hash.outputs.hash }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get short commit hash
+        id: commit_hash
+        run: echo "hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+  setup-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+
+  check-changed-service:
+    runs-on: ubuntu-latest
+    outputs:
+      admin: ${{ steps.changed-files.outputs.admin-gateway_any_changed }}
+      user: ${{ steps.changed-files.outputs.user-gateway_any_changed }}
+      auth: ${{ steps.changed-files.outputs.auth-service_any_changed }}
+      calculate: ${{ steps.changed-files.outputs.calculate-service_any_changed }}
+      config: ${{ steps.changed-files.outputs.config-service_any_changed }}
+      member: ${{ steps.changed-files.outputs.member-service_any_changed }}
+      game: ${{ steps.changed-files.outputs.game-service_any_changed }}
+      order: ${{ steps.changed-files.outputs.order-service_any_changed }}
+      communicate: ${{ steps.changed-files.outputs.communicate-service_any_changed }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v38
+        with:
+          files_yaml: |
+            admin-gateway:
+              - 'apps/admin-gateway/**'
+              - '!apps/admin-gateway/.sample.env'
+            user-gateway:
+              - 'apps/user-gateway/**'
+              - '!apps/user-gateway/.sample.env'
+            auth-service:
+              - 'apps/auth-service/**'
+              - '!apps/auth-service/.sample.env'
+            calculate-service:
+              - 'apps/calculate-service/**'
+              - '!apps/calculate-service/.sample.env'
+            config-service:
+              - 'apps/config-service/**'
+              - '!apps/config-service/.sample.env'
+            communicate-service:
+              - 'apps/communicate-service/**'
+              - '!apps/communicate-service/.sample.env'
+            game-service:
+              - 'apps/game-service/**'
+              - '!apps/game-service/.sample.env'
+            member-service:
+              - 'apps/member-service/**'
+              - '!apps/member-service/.sample.env'
+            order-service:
+              - 'apps/order-service/**'
+              - '!apps/order-service/.sample.env'
+
+  build-auth-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.auth == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build auth-service
+        uses: docker/build-push-action@v2
+        id: build-auth-service
+        with:
+          context: .
+          file: ./apps/auth-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/auth-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/auth-service:latest
+
+      - name: Verify Build auth-service
+        run: echo ${{ steps.build-auth-service.outputs.digest }}
+
+  build-calculate-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.calculate == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build calculate-service
+        uses: docker/build-push-action@v2
+        id: build-calculate-service
+        with:
+          context: .
+          file: ./apps/calculate-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/calculate-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/calculate-service:latest
+
+      - name: Verify Build calculate-service
+        run: echo ${{ steps.build-calculate-service.outputs.digest }}
+
+  build-communicate-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.communicate == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build communicate-service
+        uses: docker/build-push-action@v2
+        id: build-communicate-service
+        with:
+          context: .
+          file: ./apps/communicate-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/communicate-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/communicate-service:latest
+
+      - name: Verify Build communicate-service
+        run: echo ${{ steps.build-communicate-service.outputs.digest }}
+
+  build-config-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.config == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build config-service
+        uses: docker/build-push-action@v2
+        id: build-config-service
+        with:
+          context: .
+          file: ./apps/config-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/config-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/config-service:latest
+
+      - name: Verify Build config-service
+        run: echo ${{ steps.build-config-service.outputs.digest }}
+
+  build-game-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.game == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build game-service
+        uses: docker/build-push-action@v2
+        id: build-game-service
+        with:
+          context: .
+          file: ./apps/game-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/game-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/game-service:latest
+
+      - name: Verify Build game-service
+        run: echo ${{ steps.build-game-service.outputs.digest }}
+
+  build-member-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.member == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build member-service
+        uses: docker/build-push-action@v2
+        id: build-member-service
+        with:
+          context: .
+          file: ./apps/member-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/member-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/member-service:latest
+
+      - name: Verify Build member-service
+        run: echo ${{ steps.build-member-service.outputs.digest }}
+
+  build-order-service:
+    needs: [setup-docker, commit-hash, check-changed-service]
+    if: ${{ needs.check-changed-service.outputs.order == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build order-service
+        uses: docker/build-push-action@v2
+        id: build-order-service
+        with:
+          context: .
+          file: ./apps/order-service/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/order-service:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/order-service:latest
+
+      - name: Verify Build order-service
+        run: echo ${{ steps.build-order-service.outputs.digest }}
+
+  build-user-gateway:
+    needs:
+      [
+        setup-docker,
+        commit-hash,
+        check-changed-service,
+        build-auth-service,
+        build-calculate-service,
+        build-communicate-service,
+        build-config-service,
+        build-game-service,
+        build-member-service,
+        build-order-service,
+      ]
+    if: |
+      always() &&
+      needs.check-changed-service.outputs.user == 'true' &&
+      ((needs.build-auth-service.result == 'success' || needs.build-auth-service.result == 'skipped') &&
+      (needs.build-calculate-service.result == 'success' || needs.build-calculate-service.result == 'skipped') && 
+      (needs.build-communicate-service.result == 'success' || needs.build-communicate-service.result == 'skipped') &&
+      (needs.build-config-service.result == 'success' || needs.build-config-service.result == 'skipped') &&
+      (needs.build-game-service.result == 'success' || needs.build-game-service.result == 'skipped') &&
+      (needs.build-member-service.result == 'success' || needs.build-member-service.result == 'skipped') &&
+      (needs.build-order-service.result == 'success' || needs.build-order-service.result == 'skipped'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build user-gateway
+        uses: docker/build-push-action@v2
+        id: build-user-gateway
+        with:
+          context: .
+          file: ./apps/user-gateway/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/user-gateway:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/user-gateway:latest
+
+      - name: Verify Build user-gateway
+        run: echo ${{ steps.build-user-gateway.outputs.digest }}
+
+  build-admin-gateway:
+    needs:
+      [
+        setup-docker,
+        commit-hash,
+        check-changed-service,
+        build-auth-service,
+        build-calculate-service,
+        build-communicate-service,
+        build-config-service,
+        build-game-service,
+        build-member-service,
+        build-order-service,
+      ]
+    if: |
+      always() &&
+      needs.check-changed-service.outputs.admin == 'true' &&
+      ((needs.build-auth-service.result == 'success' || needs.build-auth-service.result == 'skipped') &&
+      (needs.build-calculate-service.result == 'success' || needs.build-calculate-service.result == 'skipped') &&
+      (needs.build-communicate-service.result == 'success' || needs.build-communicate-service.result == 'skipped') &&
+      (needs.build-config-service.result == 'success' || needs.build-config-service.result == 'skipped') &&
+      (needs.build-game-service.result == 'success' || needs.build-game-service.result == 'skipped') &&
+      (needs.build-member-service.result == 'success' || needs.build-member-service.result == 'skipped') &&
+      (needs.build-order-service.result == 'success' || needs.build-order-service.result == 'skipped'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v1
+        id: docker_session
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Build admin-gateway
+        uses: docker/build-push-action@v2
+        id: build-admin-gateway
+        with:
+          context: .
+          file: ./apps/admin-gateway/Dockerfile
+          builder: ${{ needs.setup-docker.outputs.name }}
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/admin-gateway:${{ needs.commit-hash.outputs.hash }}, ${{secrets.DOCKER_USERNAME}}/admin-gateway:latest
+
+      - name: Verify Build admin-gateway
+        run: echo ${{ steps.build-admin-gateway.outputs.digest }}
+
+  deploy-to-server:
+    needs:
+      [
+        build-user-gateway,
+        build-admin-gateway,
+        build-auth-service,
+        build-calculate-service,
+        build-communicate-service,
+        build-config-service,
+        build-game-service,
+        build-member-service,
+        build-order-service,
+      ]
+    if: |
+      always() &&
+      ((needs.build-user-gateway.result == 'success' || needs.build-user-gateway.result == 'skipped') &&
+      (needs.build-admin-gateway.result == 'success' || needs.build-admin-gateway.result == 'skipped'))
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ../deploy/nest-microservices
+            docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+            docker pull ${{secrets.DOCKER_USERNAME}}/user-gateway:latest
+            docker-compose -f docker-compose.deploy.yml up -d
+            docker image prune -f

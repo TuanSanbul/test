@@ -1,0 +1,176 @@
+version: '3.8'
+
+services:
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PWD}
+    volumes:
+      - cache:/data
+  postgres:
+    container_name: postgres_db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres-db:/data/postgres
+    ports:
+      - '${DB_PORT}:5432'
+  mongodb-primary:
+    image: docker.io/bitnami/mongodb:5.0
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=${DB_MONGO_PASSWORD}
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    volumes:
+      - 'mongodb:/bitnami/mongodb'
+    ports:
+      - '${DB_MONGO_PORT}:27017'
+  mongodb-secondary:
+    image: docker.io/bitnami/mongodb:5.0
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=${DB_MONGO_PASSWORD}
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+  mongodb-arbiter:
+    image: docker.io/bitnami/mongodb:5.0
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=${DB_MONGO_PASSWORD}
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+  admin-gateway:
+    container_name: admin-gateway
+    restart: always
+    # build:
+    #   dockerfile: ./apps/admin-gateway/Dockerfile
+    #   context: .
+    image: sanbul/admin-gateway
+    depends_on:
+      - auth-service
+      - config-service
+      - member-service
+      - calculate-service
+      - communicate-service
+      - game-service
+    ports:
+      - '${ADMIN_GATEWAY_PORT}:3000'
+    env_file: ./apps/admin-gateway/.env
+  user-gateway:
+    container_name: user-gateway
+    restart: always
+    # build:
+    #   dockerfile: ./apps/user-gateway/Dockerfile
+    #   context: .
+    image: sanbul/user-gateway
+    depends_on:
+      - auth-service
+      - config-service
+      - member-service
+      - calculate-service
+      - communicate-service
+      - game-service
+    ports:
+      - '${USER_GATEWAY_PORT}:3030'
+    env_file: ./apps/user-gateway/.env
+  config-service:
+    depends_on:
+      - auth-service
+    container_name: config-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/config-service/Dockerfile
+    #   context: .
+    image: sanbul/config-service
+    ports:
+      - '${CONFIG_SERVICE_PORT}:3002'
+    env_file: ./apps/config-service/.env
+  member-service:
+    depends_on:
+      - auth-service
+    container_name: member-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/member-service/Dockerfile
+    #   context: .
+    image: sanbul/member-service
+    ports:
+      - '${MEMBER_SERVICE_PORT}:3003'
+    env_file: ./apps/member-service/.env
+  auth-service:
+    container_name: auth-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/auth-service/Dockerfile
+    #   context: .
+    image: sanbul/auth-service
+    ports:
+      - '${AUTH_SERVICE_PORT}:3001'
+    env_file: ./apps/auth-service/.env
+  communicate-service:
+    depends_on:
+      - auth-service
+    container_name: communicate-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/communicate-service/Dockerfile
+    #   context: .
+    image: sanbul/communicate-service
+    ports:
+      - '${COMMUNICATE_SERVICE_PORT}:3004'
+    env_file: ./apps/communicate-service/.env
+  calculate-service:
+    depends_on:
+      - auth-service
+    container_name: calculate-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/calculate-service/Dockerfile
+    #   context: .
+    image: sanbul/calculate-service
+    ports:
+      - '${CALCULATE_SERVICE_PORT}:3005'
+    env_file: ./apps/calculate-service/.env
+  game-service:
+    depends_on:
+      - auth-service
+    container_name: game-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/game-service/Dockerfile
+    #   context: .
+    image: sanbul/game-service
+    ports:
+      - '${GAME_SERVICE_PORT}:3006'
+    env_file: ./apps/game-service/.env
+  order-service:
+    depends_on:
+      - auth-service
+    container_name: order-service
+    restart: always
+    # build:
+    #   dockerfile: ./apps/order-service/Dockerfile
+    #   context: .
+    image: sanbul/order-service
+    ports:
+      - '${ORDER_SERVICE_PORT}:3007'
+    env_file: ./apps/order-service/.env
+volumes:
+  mongodb:
+    driver: local
+  cache:
+    driver: local
+  postgres-db:
+    driver: local
